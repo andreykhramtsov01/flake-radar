@@ -7,11 +7,15 @@ import flakeradar.core.StatsAggregator;
 import flakeradar.core.TestCorrelation;
 import flakeradar.core.TestExecutionRecord;
 import flakeradar.core.TestStats;
+import flakeradar.report.HtmlReportGenerator;
 import org.junit.platform.launcher.Launcher;
 import org.junit.platform.launcher.LauncherDiscoveryRequest;
 import org.junit.platform.launcher.core.LauncherDiscoveryRequestBuilder;
 import org.junit.platform.launcher.core.LauncherFactory;
 
+import java.io.IOException;
+import java.nio.file.Path;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
 
@@ -59,6 +63,19 @@ public class FlakyTestRunner {
         List<TestCorrelation> correlations = new CorrelationAnalyzer().findCorrelatedFailures(records, CORRELATION_THRESHOLD);
 
         printSummary(stats, correlations);
+        writeReport(stats, correlations, runs);
+    }
+
+    private static void writeReport(List<TestStats> stats, List<TestCorrelation> correlations, int runs) {
+        String html = new HtmlReportGenerator().render(stats, correlations, runs, LocalDateTime.now());
+        Path output = Path.of("target", "flake-report", "index.html");
+        try {
+            new HtmlReportGenerator().writeToFile(html, output);
+            System.out.println();
+            System.out.println("Отчёт сохранён в " + output.toAbsolutePath());
+        } catch (IOException e) {
+            System.err.println("Не удалось записать отчёт: " + e.getMessage());
+        }
     }
 
     private static void printSummary(List<TestStats> stats, List<TestCorrelation> correlations) {
