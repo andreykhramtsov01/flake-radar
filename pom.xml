@@ -39,6 +39,17 @@
   <build>
     <plugins>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>3.2.5</version>
+        <configuration>
+          <!-- демо-сьют нестабилен по задумке, обычный mvn test его не запускает -->
+          <excludes>
+            <exclude>**/demo/**</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+      <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
         <version>3.2.0</version>
